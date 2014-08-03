@@ -26,16 +26,16 @@ describe('Service: schemaResources', function () {
           "type": "array",
           "items": {
             "type": "object",
-//            "properties": {
-//              "cardId": {
-//                "identify": true,
-//                "type": "string"
-//              },
-//              "type": {
-//                "type": "string",
-//                "default": "template"
-//              }
-//            },
+            "properties": {
+              "cardId": {
+                "identify": true,
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "default": "template"
+              }
+            },
             "links": [
               {
                 "rel": "{cardId}",
@@ -137,8 +137,50 @@ describe('Service: schemaResources', function () {
     };
     expect(!!schemaResources).toBe(true);
     schemaResources.makeResources('/api/v1/tests').then(function (resources) {
+      $httpBackend.expectGET('/api/v1/students/123/cards/1').respond(200, {
+        studentId: 123,
+        cardId: 1,
+        type: 'map'
+      });
       var aResources = schemaResources.resourcify(resources, data);
-      expect(aResources['{cardId}'].url).toEqual('/api/v1/students/123/cards/1');
+      var Resource = aResources['{cardId}'].resource;
+      Resource.get({
+        studentId: 123,
+        cardId: 1
+      });
+    });
+    $httpBackend.flush();
+  });
+
+  it('should POST some data', function () {
+    var data = {
+      studentId: 123,
+      cards: [
+        {
+          cardId: 1,
+          type: 'map'
+        },
+        {
+          cardId: 2,
+          type: 'map'
+        }
+      ]
+    };
+    schemaResources.makeResources('/api/v1/tests').then(function (resources) {
+      var aResources = schemaResources.resourcify(resources, data)
+        , Resource = aResources['{cardId}'].resource
+        , Card = new Resource({
+          studentId: 123,
+          cardId: 1,
+          type: 'map'
+        });
+      $httpBackend.expectPOST('/api/v1/students/123/cards/1').respond(200, {
+        studentId: 123,
+        cardId: 1,
+        type: 'map'
+      });
+      Card.type = 'yellow';
+      Card.$save();
     });
     $httpBackend.flush();
   });

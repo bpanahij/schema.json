@@ -135,11 +135,13 @@ angular.module('schemajsonApp')
               return smashedData[property];
             });
           }
-          var resource = $resource(resourceConfig.url, angular.extend(setupData, resourceConfig.defaults));
+          var defaults = angular.extend(setupData, resourceConfig.defaults)
+            , resource = $resource(resourceConfig.url, defaults);
           resources[rel] = {
             resource: resource,
             data: resourceData
           };
+          console.log('resource', resourceConfig.url, JSON.stringify(angular.extend(setupData, resourceConfig.defaults)));
         });
         return resources;
       };

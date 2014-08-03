@@ -73,7 +73,7 @@ angular.module('schemajsonApp')
          * @returns {*}
          */
         responseError: function (response) {
-          var headers = response.headers();
+          var headers = angular.isDefined(response.headers) ? response.headers() : {};
           httpHandlers.getAuth(response);
           if (response.status >= REDIRECT_CODE && response.status < ERROR_CODE) {
             // Redirect, so that all API clients request new schemas and re-interpolate new data
